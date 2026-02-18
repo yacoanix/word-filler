@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Autorellenador de plantillas Word</title>
+  <script src="https://unpkg.com/pizzip@3.1.4/dist/pizzip.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #f4f6fb;
+      color: #1e1e2e;
+      min-height: 100vh;
+      padding: 3rem 1rem 4rem;
+    }
+
+    .container {
+      max-width: 660px;
+      margin: 0 auto;
+    }
+
+    .header {
+      margin-bottom: 2rem;
+    }
+
+    h1 {
+      font-size: 1.75rem;
+      font-weight: 800;
+      color: #111;
+      line-height: 1.2;
+      margin-bottom: 0.6rem;
+    }
+
+    .subtitle {
+      color: #5c5c7a;
+      font-size: 0.93rem;
+      line-height: 1.65;
+    }
+
+    .subtitle code {
+      background: #ede9fe;
+      color: #5b21b6;
+      border-radius: 4px;
+      padding: 0.1em 0.35em;
+      font-size: 0.88em;
+      font-family: 'Courier New', monospace;
+    }
+
+    .card {
+      background: #fff;
+      border-radius: 14px;
+      padding: 1.5rem;
+      margin-top: 1.25rem;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 4px 16px rgba(0,0,0,0.04);
+      border: 1px solid #e8eaf0;
+    }
+
+    .card-title {
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #9ca3af;
+      margin-bottom: 1.1rem;
+    }
+
+    .steps {
+      display: flex;
+      flex-direction: column;
+      gap: 0.85rem;
+    }
+
+    .step {
+      display: flex;
+      gap: 0.9rem;
+      align-items: flex-start;
+    }
+
+    .step-num {
+      flex-shrink: 0;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: #ede9fe;
+      color: #6d28d9;
+      font-size: 0.72rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-top: 0.1rem;
+    }
+
+    .step-text {
+      font-size: 0.875rem;
+      color: #444;
+      line-height: 1.65;
+    }
+
+    .step-text code {
+      background: #f3f4f6;
+      color: #374151;
+      border-radius: 4px;
+      padding: 0.1em 0.35em;
+      font-size: 0.85em;
+      font-family: 'Courier New', monospace;
+    }
+
+    .step-text strong { color: #111; }
+
+    .dropzone {
+      background: #fff;
+      border-radius: 14px;
+      padding: 2.5rem 2rem;
+      text-align: center;
+      cursor: pointer;
+      transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
+      position: relative;
+      margin-top: 1.25rem;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 4px 16px rgba(0,0,0,0.04);
+      border: 2px dashed #d1d5db;
+    }
+
+    .dropzone:hover,
+    .dropzone.dragover {
+      border-color: #6366f1;
+      background: #fafafe;
+      box-shadow: 0 0 0 4px rgba(99,102,241,0.08);
+    }
+
+    .dropzone input[type="file"] {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      cursor: pointer;
+      width: 100%;
+      height: 100%;
+    }
+
+    .dropzone-icon {
+      font-size: 2.2rem;
+      margin-bottom: 0.6rem;
+      filter: grayscale(0.2);
+    }
+
+    .dropzone-text {
+      font-size: 0.95rem;
+      font-weight: 500;
+      color: #333;
+    }
+
+    .dropzone-hint {
+      font-size: 0.78rem;
+      color: #9ca3af;
+      margin-top: 0.4rem;
+    }
+
+    .filename {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      margin-top: 1rem;
+      background: #ede9fe;
+      color: #5b21b6;
+      border-radius: 999px;
+      padding: 0.3rem 0.9rem;
+      font-size: 0.83rem;
+      font-weight: 600;
+    }
+
+    .tags-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    .tag-badge {
+      background: #f3f0ff;
+      color: #5b21b6;
+      border: 1px solid #ddd6fe;
+      border-radius: 6px;
+      padding: 0.25rem 0.65rem;
+      font-size: 0.8rem;
+      font-weight: 600;
+      font-family: 'Courier New', monospace;
+      letter-spacing: 0.02em;
+    }
+
+    .form-grid {
+      display: grid;
+      gap: 1rem;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 0.3rem;
+    }
+
+    .field label {
+      font-size: 0.83rem;
+      font-weight: 600;
+      color: #222;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .field label .tag-hint {
+      font-family: 'Courier New', monospace;
+      font-size: 0.73rem;
+      color: #9ca3af;
+      font-weight: 400;
+      background: #f3f4f6;
+      padding: 0.1em 0.4em;
+      border-radius: 4px;
+    }
+
+    .field input {
+      border: 1.5px solid #e5e7eb;
+      border-radius: 9px;
+      padding: 0.6rem 0.85rem;
+      font-size: 0.93rem;
+      outline: none;
+      transition: border-color 0.15s, box-shadow 0.15s;
+      width: 100%;
+      color: #111;
+      background: #fafafa;
+    }
+
+    .field input:focus {
+      border-color: #6366f1;
+      background: #fff;
+      box-shadow: 0 0 0 3px rgba(99,102,241,0.12);
+    }
+
+    .field input::placeholder { color: #c4c4d0; }
+
+    .divider {
+      border: none;
+      border-top: 1px solid #f0f0f5;
+      margin: 1.25rem 0 1rem;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      padding: 0.8rem 1.5rem;
+      font-size: 0.97rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: opacity 0.15s, transform 0.1s, box-shadow 0.15s;
+      width: 100%;
+      box-shadow: 0 2px 8px rgba(99,102,241,0.3);
+      letter-spacing: 0.01em;
+    }
+
+    .btn:hover { opacity: 0.92; box-shadow: 0 4px 14px rgba(99,102,241,0.4); }
+    .btn:active { transform: scale(0.985); }
+    .btn:disabled {
+      background: linear-gradient(135deg, #c7d2fe 0%, #a5b4fc 100%);
+      box-shadow: none;
+      cursor: not-allowed;
+      opacity: 1;
+    }
+
+    .warning {
+      background: #fffbeb;
+      border: 1px solid #fde68a;
+      border-radius: 9px;
+      padding: 0.75rem 1rem;
+      font-size: 0.81rem;
+      color: #78350f;
+      margin-bottom: 1rem;
+      line-height: 1.6;
+    }
+
+    .success-msg {
+      background: #f0fdf4;
+      border: 1px solid #bbf7d0;
+      border-radius: 9px;
+      padding: 0.75rem 1rem;
+      font-size: 0.86rem;
+      font-weight: 500;
+      color: #15803d;
+      margin-top: 0.85rem;
+      display: none;
+      text-align: center;
+    }
+
+    .hidden { display: none; }
+  </style>
+</head>
+<body>
+<div class="container">
+
+  <div class="header">
+    <h1>Autorellenador de plantillas Word</h1>
+    <p class="subtitle">
+      Crea un <code>.docx</code> con etiquetas entre corchetes — <code>[NOMBRE]</code>, <code>[FECHA]</code>, <code>[EMPRESA]</code> —,
+      súbelo, rellena los campos y descarga el documento generado.
+    </p>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Cómo preparar la plantilla</div>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-text">Abre tu documento Word y escribe las etiquetas donde quieras insertar valores: <code>[NOMBRE]</code>, <code>[CIUDAD]</code>, <code>[FECHA]</code>…</div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-text">Escribe cada etiqueta <strong>de una sola vez</strong>, sin cambiar el formato a mitad de ella — si lo haces, Word la parte internamente y no se detectará.</div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-text">Guarda el archivo como <strong>.docx</strong> (no .doc ni .odt) y súbelo aquí abajo.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="dropzone" id="dropzone">
+    <input type="file" id="fileInput" accept=".docx">
+    <div class="dropzone-icon">📄</div>
+    <div class="dropzone-text">Arrastra tu plantilla aquí o haz clic para seleccionarla</div>
+    <div class="dropzone-hint">Solo archivos .docx &nbsp;·&nbsp; Todo ocurre en tu navegador, ningún dato se envía a ningún servidor</div>
+    <div class="filename hidden" id="filename"></div>
+  </div>
+
+  <div class="card hidden" id="tagsSection">
+    <div class="card-title">Etiquetas detectadas</div>
+    <div class="tags-list" id="tagsList"></div>
+  </div>
+
+  <div class="card hidden" id="formSection">
+    <div class="card-title">Rellenar campos</div>
+    <form id="fillForm" class="form-grid"></form>
+
+    <hr class="divider">
+
+    <div class="warning" id="warningBox" style="display:none;">
+      ⚠️ <strong>¿Falta alguna etiqueta?</strong> Word puede haberla dividido en fragmentos internos al cambiar el formato dentro de ella. Vuelve a escribirla en la plantilla de un tirón, sin aplicar cambios de estilo a mitad de la etiqueta.
+    </div>
+
+    <button class="btn" id="generateBtn" type="button" disabled>
+      ⬇&nbsp; Generar documento
+    </button>
+
+    <div class="success-msg" id="successMsg">
+      ✅ Documento generado y descargado correctamente.
+    </div>
+  </div>
+
+</div>
+
+  <p style="text-align:center; margin-top:2.5rem; font-size:0.78rem; color:#b0b0c0;">
+    Creado por <a href="https://github.com/yacoanix" target="_blank" style="color:#6366f1; text-decoration:none; font-weight:600;">Yacoanix</a>
+    &nbsp;·&nbsp; <a href="https://github.com/yacoanix" target="_blank" style="color:#9ca3af; text-decoration:none;">github.com/yacoanix</a>
+  </p>
+
+<script>
+  let zipInstance = null;
+  let originalXml = '';
+  let detectedTags = [];
+  let currentFile = null;
+
+  const dropzone = document.getElementById('dropzone');
+  const fileInput = document.getElementById('fileInput');
+  const filenameEl = document.getElementById('filename');
+  const tagsSection = document.getElementById('tagsSection');
+  const tagsList = document.getElementById('tagsList');
+  const formSection = document.getElementById('formSection');
+  const fillForm = document.getElementById('fillForm');
+  const generateBtn = document.getElementById('generateBtn');
+  const successMsg = document.getElementById('successMsg');
+
+  dropzone.addEventListener('dragover', e => { e.preventDefault(); dropzone.classList.add('dragover'); });
+  dropzone.addEventListener('dragleave', () => dropzone.classList.remove('dragover'));
+  dropzone.addEventListener('drop', e => {
+    e.preventDefault();
+    dropzone.classList.remove('dragover');
+    const file = e.dataTransfer.files[0];
+    if (file) handleFile(file);
+  });
+
+  fileInput.addEventListener('change', () => {
+    if (fileInput.files[0]) handleFile(fileInput.files[0]);
+  });
+
+  function handleFile(file) {
+    if (!file.name.endsWith('.docx')) {
+      alert('Por favor selecciona un archivo .docx');
+      return;
+    }
+    currentFile = file;
+
+    filenameEl.textContent = '📎 ' + file.name;
+    filenameEl.classList.remove('hidden');
+    successMsg.style.display = 'none';
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      try {
+        zipInstance = new PizZip(e.target.result);
+        originalXml = zipInstance.files['word/document.xml'].asText();
+        const regex = /\[([^\]]+)\]/g;
+        detectedTags = [...new Set([...originalXml.matchAll(regex)].map(m => m[1]))];
+        renderTags(detectedTags);
+        renderForm(detectedTags);
+      } catch (err) {
+        alert('Error al leer el archivo: ' + err.message);
+      }
+    };
+    reader.readAsArrayBuffer(file);
+  }
+
+  function renderTags(tags) {
+    tagsList.innerHTML = '';
+    if (tags.length === 0) {
+      tagsList.innerHTML = '<span style="color:#888;font-size:0.9rem;">No se detectaron etiquetas del tipo [ETIQUETA]</span>';
+    } else {
+      tags.forEach(tag => {
+        const badge = document.createElement('span');
+        badge.className = 'tag-badge';
+        badge.textContent = '[' + tag + ']';
+        tagsList.appendChild(badge);
+      });
+    }
+    tagsSection.classList.remove('hidden');
+  }
+
+  function renderForm(tags) {
+    fillForm.innerHTML = '';
+    generateBtn.disabled = tags.length === 0;
+
+    tags.forEach(tag => {
+      const field = document.createElement('div');
+      field.className = 'field';
+
+      const label = document.createElement('label');
+      label.htmlFor = 'field_' + tag;
+      const humanName = tag.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+      label.innerHTML = humanName + ' <span class="tag-hint">[' + tag + ']</span>';
+
+      const input = document.createElement('input');
+      input.type = 'text';
+      input.id = 'field_' + tag;
+      input.name = tag;
+      input.placeholder = 'Valor para [' + tag + ']';
+
+      field.appendChild(label);
+      field.appendChild(input);
+      fillForm.appendChild(field);
+    });
+
+    formSection.classList.remove('hidden');
+  }
+
+  generateBtn.addEventListener('click', async () => {
+    if (!zipInstance || !originalXml) return;
+
+    const valores = {};
+    detectedTags.forEach(tag => {
+      const input = document.getElementById('field_' + tag);
+      valores[tag] = input ? input.value : '';
+    });
+
+    let xmlFinal = originalXml;
+    for (const [tag, valor] of Object.entries(valores)) {
+      xmlFinal = xmlFinal.replaceAll('[' + tag + ']', valor);
+    }
+
+    try {
+      const newZip = new PizZip(await currentFile.arrayBuffer());
+      newZip.file('word/document.xml', xmlFinal);
+
+      const blob = newZip.generate({ type: 'blob' });
+
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      const ts = new Date().toISOString().replace(/[-:T]/g, '').slice(0, 14);
+      const baseName = currentFile.name.replace(/\.docx$/i, '');
+      a.download = baseName + '_' + ts + '.docx';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+
+      successMsg.style.display = 'block';
+    } catch (err) {
+      alert('Error al generar el documento: ' + err.message);
+    }
+  });
+</script>
+</body>
+</html>
