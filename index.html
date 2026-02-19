@@ -455,6 +455,39 @@
     .step-text code.c-text   { background: #ede9fe; color: #5b21b6; }
     .step-text code.c-date   { background: #f0fdf4; color: #15803d; }
     .step-text code.c-gender { background: #fff0f6; color: #9d174d; }
+
+    .instr-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      cursor: pointer;
+      user-select: none;
+      border-radius: 6px;
+      margin: -0.25rem;
+      padding: 0.25rem;
+      transition: background 0.15s;
+    }
+    .instr-header:hover { background: #f9fafb; }
+
+    .instr-chevron {
+      flex-shrink: 0;
+      color: #9ca3af;
+      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .instr-chevron.open { transform: rotate(180deg); }
+
+    .instr-body {
+      display: grid;
+      grid-template-rows: 1fr;
+      transition: grid-template-rows 0.35s cubic-bezier(0.4, 0, 0.2, 1),
+                  opacity 0.3s ease;
+      opacity: 1;
+    }
+    .instr-body.collapsed {
+      grid-template-rows: 0fr;
+      opacity: 0;
+    }
+    .instr-body > div { overflow: hidden; }
   </style>
 </head>
 <body>
@@ -469,30 +502,37 @@
     </p>
   </div>
 
-  <div class="card">
-    <div class="card-title">Cómo preparar la plantilla — <span style="color:#6366f1;">lee esto antes de empezar</span></div>
-    <div class="steps">
-      <div class="step">
-        <div class="step-num">1</div>
-        <div class="step-text">Abre tu documento Word y escribe las etiquetas donde quieras insertar valores.</div>
-      </div>
-      <div class="step">
-        <div class="step-num">2</div>
-        <div class="step-text">Escribe cada etiqueta <strong>de una sola vez</strong>, sin cambiar el formato a mitad de ella — si lo haces, Word la parte internamente y puede que no se detecte o que se detecte pero este lector la interprete con caracteres extraños.</div>
-      </div>
-      <div class="step">
-        <div class="step-num">3</div>
-        <div class="step-text">Hay tres tipos de etiqueta:
-          <ul>
-            <li><code class="c-text">[CAMPO]</code> — texto libre; escribe el valor al rellenar el formulario. Por ejemplo <code>[NOMBRE]</code>, <code>[CIUDAD]</code>, <code>[EMPRESA]</code>.</li>
-            <li><code class="c-date">[CAMPO:fecha]</code> — selector de fecha; el valor se inserta como "21 de Febrero de 2026". Por ejemplo <code>[FECHA_FIRMA:fecha]</code>.</li>
-            <li><code class="c-gender">[GRUPO:masc|fem]</code> — concordancia de género; todas las etiquetas del mismo grupo se controlan con un único selector. Por ejemplo <code>[ARRENDATARIO:el|la]</code> y <code>arrendatari[ARRENDATARIO:o|a]</code> son el mismo grupo.</li>
-          </ul>
+  <div class="card" id="instrCard">
+    <div class="instr-header" id="instrToggle">
+      <span class="card-title" style="margin-bottom:0;">Cómo preparar la plantilla — <span style="color:#6366f1;">lee esto antes de empezar</span></span>
+      <svg class="instr-chevron open" id="instrChevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+    </div>
+    <div class="instr-body" id="instrBody">
+      <div>
+        <div class="steps" style="margin-top:1.1rem;">
+          <div class="step">
+            <div class="step-num">1</div>
+            <div class="step-text">Abre tu documento Word y escribe las etiquetas donde quieras insertar valores.</div>
+          </div>
+          <div class="step">
+            <div class="step-num">2</div>
+            <div class="step-text">Escribe cada etiqueta <strong>de una sola vez</strong>, sin cambiar el formato a mitad de ella — si lo haces, Word la parte internamente y puede que no se detecte o que se detecte pero este lector la interprete con caracteres extraños.</div>
+          </div>
+          <div class="step">
+            <div class="step-num">3</div>
+            <div class="step-text">Hay tres tipos de etiqueta:
+              <ul>
+                <li><code class="c-text">[CAMPO]</code> — texto libre; escribe el valor al rellenar el formulario. Por ejemplo <code>[NOMBRE]</code>, <code>[CIUDAD]</code>, <code>[EMPRESA]</code>.</li>
+                <li><code class="c-date">[CAMPO:fecha]</code> — selector de fecha; el valor se inserta como "21 de Febrero de 2026". Por ejemplo <code>[FECHA_FIRMA:fecha]</code>.</li>
+                <li><code class="c-gender">[GRUPO:masc|fem]</code> — concordancia de género; todas las etiquetas del mismo grupo se controlan con un único selector. Por ejemplo <code>[ARRENDATARIO:el|la]</code> y <code>arrendatari[ARRENDATARIO:o|a]</code> son el mismo grupo.</li>
+              </ul>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num">4</div>
+            <div class="step-text">Guarda el archivo como <strong>.docx</strong> (no .doc ni .odt) y súbelo aquí abajo.</div>
+          </div>
         </div>
-      </div>
-      <div class="step">
-        <div class="step-num">4</div>
-        <div class="step-text">Guarda el archivo como <strong>.docx</strong> (no .doc ni .odt) y súbelo aquí abajo.</div>
       </div>
     </div>
   </div>
@@ -555,6 +595,19 @@
   </p>
 
 <script>
+  const instrBody = document.getElementById('instrBody');
+  const instrChevron = document.getElementById('instrChevron');
+
+  function collapseInstr() {
+    instrBody.classList.add('collapsed');
+    instrChevron.classList.remove('open');
+  }
+
+  document.getElementById('instrToggle').addEventListener('click', () => {
+    const collapsed = instrBody.classList.toggle('collapsed');
+    instrChevron.classList.toggle('open', !collapsed);
+  });
+
   let zipInstance = null;
   let originalXml = '';
   let detectedTags = [];
@@ -604,6 +657,7 @@
   });
 
   function handleFile(file) {
+    if (currentFile) return;
     if (!file.name.endsWith('.docx')) {
       alert('Por favor selecciona un archivo .docx');
       return;
@@ -613,6 +667,7 @@
     document.getElementById('filenameText').textContent = '📎 ' + file.name;
     filenameEl.classList.remove('hidden');
     document.getElementById('resetBtn').classList.remove('hidden');
+    collapseInstr();
     successMsg.style.display = 'none';
 
     const reader = new FileReader();
@@ -878,7 +933,7 @@
           if (el) el.value = today;
         });
       });
-      fillForm.before(fillBtn);
+      fillForm.prepend(fillBtn);
     }
 
     formSection.classList.remove('hidden');
