@@ -97,6 +97,7 @@
       font-size: 0.875rem;
       color: #444;
       line-height: 1.65;
+      min-width: 0;
     }
 
     .step-text code {
@@ -205,7 +206,8 @@
       color: #222;
       display: flex;
       align-items: center;
-      gap: 0.5rem;
+      flex-wrap: wrap;
+      gap: 0.35rem;
     }
 
     .field label .tag-hint {
@@ -216,6 +218,7 @@
       background: #f3f4f6;
       padding: 0.1em 0.4em;
       border-radius: 4px;
+      word-break: break-all;
     }
 
     .field input {
@@ -272,6 +275,23 @@
       opacity: 1;
     }
 
+    .btn-pdf {
+      background: #0f172a;
+      box-shadow: 0 2px 8px rgba(15,23,42,0.3);
+      margin-top: 0.6rem;
+    }
+    .btn-pdf:hover:not(:disabled) {
+      background: #1e293b;
+      box-shadow: 0 4px 14px rgba(15,23,42,0.4);
+      opacity: 1;
+    }
+    .btn-pdf:disabled {
+      background: #94a3b8;
+      box-shadow: none;
+    }
+
+
+
     .warning {
       background: #fffbeb;
       border: 1px solid #fde68a;
@@ -296,7 +316,145 @@
       text-align: center;
     }
 
-    .hidden { display: none; }
+    .hidden { display: none !important; }
+
+    .tag-badge--gender {
+      background: #fff0f6;
+      color: #9d174d;
+      border: 1px solid #fbcfe8;
+      border-radius: 6px;
+      padding: 0.25rem 0.65rem;
+      font-size: 0.8rem;
+      font-weight: 600;
+      font-family: 'Courier New', monospace;
+      letter-spacing: 0.02em;
+    }
+
+    .gender-section-label {
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #9ca3af;
+      padding-top: 0.25rem;
+      padding-bottom: 0.25rem;
+      border-top: 1px solid #f0f0f5;
+      margin-top: 0.25rem;
+    }
+
+    .tag-badge--date {
+      background: #f0fdf4;
+      color: #15803d;
+      border: 1px solid #bbf7d0;
+      border-radius: 6px;
+      padding: 0.25rem 0.65rem;
+      font-size: 0.8rem;
+      font-weight: 600;
+      font-family: 'Courier New', monospace;
+      letter-spacing: 0.02em;
+    }
+
+    .date-section-label {
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #9ca3af;
+      padding-top: 0.25rem;
+      padding-bottom: 0.25rem;
+      border-top: 1px solid #f0f0f5;
+      margin-top: 0.25rem;
+    }
+
+    .segmented-control {
+      display: inline-flex;
+      border-radius: 8px;
+      border: 1.5px solid #e5e7eb;
+      overflow: hidden;
+      background: #f9fafb;
+      max-width: 100%;
+    }
+
+    .segmented-control input[type="radio"] {
+      position: absolute;
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .segmented-control label {
+      padding: 0.45rem 1.1rem;
+      font-size: 0.87rem;
+      font-weight: 500;
+      color: #6b7280;
+      cursor: pointer;
+      transition: background 0.15s, color 0.15s;
+      user-select: none;
+    }
+
+    .segmented-control input[type="radio"]:checked + label {
+      background: #6366f1;
+      color: #fff;
+      font-weight: 600;
+    }
+
+    .gender-preview {
+      font-size: 0.79rem;
+      color: #6b7280;
+      margin-top: 0.2rem;
+    }
+
+    .gender-preview strong {
+      color: #374151;
+    }
+
+    .btn-reset {
+      display: block;
+      width: 100%;
+      margin-top: 0.75rem;
+      padding: 0.65rem;
+      background: #fee2e2;
+      color: #b91c1c;
+      border: 1.5px solid #fca5a5;
+      border-radius: 10px;
+      font-size: 0.92rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 0.15s, border-color 0.15s;
+    }
+
+    .btn-reset:hover {
+      background: #fecaca;
+      border-color: #f87171;
+    }
+
+    .step-text ul {
+      margin-top: 0.6rem;
+      padding-left: 1rem;
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0.7rem;
+    }
+
+    .step-text li {
+      position: relative;
+    }
+
+    .step-text li::before {
+      content: '';
+      position: absolute;
+      left: -0.85rem;
+      top: 0.55em;
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: #9ca3af;
+    }
+
+    .step-text code.c-text   { background: #ede9fe; color: #5b21b6; }
+    .step-text code.c-date   { background: #f0fdf4; color: #15803d; }
+    .step-text code.c-gender { background: #fff0f6; color: #9d174d; }
   </style>
 </head>
 <body>
@@ -305,36 +463,57 @@
   <div class="header">
     <h1>Autorellenador de plantillas Word</h1>
     <p class="subtitle">
-      Crea un <code>.docx</code> con etiquetas entre corchetes — <code>[NOMBRE]</code>, <code>[FECHA]</code>, <code>[EMPRESA]</code> —,
+      Crea un <code>.docx</code> con etiquetas entre corchetes — <code>[NOMBRE]</code>, <code>[EMPRESA]</code> —,
+      etiquetas de fecha — <code>[FECHA:fecha]</code> — o etiquetas de género — <code>[ARRENDATARIO:el|la]</code> —,
       súbelo, rellena los campos y descarga el documento generado.
     </p>
   </div>
 
   <div class="card">
-    <div class="card-title">Cómo preparar la plantilla</div>
+    <div class="card-title">Cómo preparar la plantilla — <span style="color:#6366f1;">lee esto antes de empezar</span></div>
     <div class="steps">
       <div class="step">
         <div class="step-num">1</div>
-        <div class="step-text">Abre tu documento Word y escribe las etiquetas donde quieras insertar valores: <code>[NOMBRE]</code>, <code>[CIUDAD]</code>, <code>[FECHA]</code>…</div>
+        <div class="step-text">Abre tu documento Word y escribe las etiquetas donde quieras insertar valores.</div>
       </div>
       <div class="step">
         <div class="step-num">2</div>
-        <div class="step-text">Escribe cada etiqueta <strong>de una sola vez</strong>, sin cambiar el formato a mitad de ella — si lo haces, Word la parte internamente y no se detectará.</div>
+        <div class="step-text">Escribe cada etiqueta <strong>de una sola vez</strong>, sin cambiar el formato a mitad de ella — si lo haces, Word la parte internamente y puede que no se detecte o que se detecte pero este lector la interprete con caracteres extraños.</div>
       </div>
       <div class="step">
         <div class="step-num">3</div>
+        <div class="step-text">Hay tres tipos de etiqueta:
+          <ul>
+            <li><code class="c-text">[CAMPO]</code> — texto libre; escribe el valor al rellenar el formulario. Por ejemplo <code>[NOMBRE]</code>, <code>[CIUDAD]</code>, <code>[EMPRESA]</code>.</li>
+            <li><code class="c-date">[CAMPO:fecha]</code> — selector de fecha; el valor se inserta como "21 de Febrero de 2026". Por ejemplo <code>[FECHA_FIRMA:fecha]</code>.</li>
+            <li><code class="c-gender">[GRUPO:masc|fem]</code> — concordancia de género; todas las etiquetas del mismo grupo se controlan con un único selector. Por ejemplo <code>[ARRENDATARIO:el|la]</code> y <code>arrendatari[ARRENDATARIO:o|a]</code> son el mismo grupo.</li>
+          </ul>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
         <div class="step-text">Guarda el archivo como <strong>.docx</strong> (no .doc ni .odt) y súbelo aquí abajo.</div>
       </div>
     </div>
+  </div>
+
+  <div class="warning" style="margin-top:1rem;">
+    <div>💡 <strong>El nombre del archivo también puede contener etiquetas.</strong> Si tu plantilla se llama <code>contrato_[NOMBRE]_[FECHA:fecha].docx</code>, el archivo descargado tendrá esos valores ya sustituidos en el nombre.</div>
+    <div style="margin-top:0.4rem;">🔒 <strong>Todo ocurre en tu navegador.</strong> Ningún dato se envía a ningún servidor.</div>
+    <div style="margin-top:0.4rem;">🌐 <strong>Requiere conexión a internet.</strong> Las librerías necesarias se cargan desde CDN externos.</div>
   </div>
 
   <div class="dropzone" id="dropzone">
     <input type="file" id="fileInput" accept=".docx">
     <div class="dropzone-icon">📄</div>
     <div class="dropzone-text">Arrastra tu plantilla aquí o haz clic para seleccionarla</div>
-    <div class="dropzone-hint">Solo archivos .docx &nbsp;·&nbsp; Todo ocurre en tu navegador, ningún dato se envía a ningún servidor</div>
-    <div class="filename hidden" id="filename"></div>
+    <div class="dropzone-hint">Solo archivos .docx</div>
+    <div class="filename hidden" id="filename">
+      <span id="filenameText"></span>
+    </div>
   </div>
+
+  <button class="btn-reset hidden" id="resetBtn">✕ Cambiar archivo</button>
 
   <div class="card hidden" id="tagsSection">
     <div class="card-title">Etiquetas detectadas</div>
@@ -347,13 +526,21 @@
 
     <hr class="divider">
 
-    <div class="warning" id="warningBox" style="display:none;">
-      ⚠️ <strong>¿Falta alguna etiqueta?</strong> Word puede haberla dividido en fragmentos internos al cambiar el formato dentro de ella. Vuelve a escribirla en la plantilla de un tirón, sin aplicar cambios de estilo a mitad de la etiqueta.
+    <div class="warning" id="warningBox">
+      ⚠️ <strong>¿Falta alguna etiqueta o aparecen caracteres extraños?</strong> Word puede haber dividido la etiqueta en fragmentos internos al cambiar el formato dentro de ella, lo que puede impedir su detección o corromper el resultado. Vuelve a escribirla en la plantilla de un tirón, sin aplicar cambios de estilo a mitad de la etiqueta.
     </div>
 
     <button class="btn" id="generateBtn" type="button" disabled>
       ⬇&nbsp; Generar documento
     </button>
+
+    <button class="btn btn-pdf" id="pdfBtn" type="button" disabled>
+      📄&nbsp; Generar PDF
+    </button>
+
+    <p style="font-size:0.78rem;color:#9ca3af;margin-top:0.5rem;text-align:center;line-height:1.5;">
+      En el diálogo de impresión, desactiva <strong style="color:#6b7280;">«Encabezados y pies de página»</strong> para un resultado limpio.
+    </p>
 
     <div class="success-msg" id="successMsg">
       ✅ Documento generado y descargado correctamente.
@@ -372,6 +559,8 @@
   let originalXml = '';
   let detectedTags = [];
   let currentFile = null;
+  let detectedGenderGroups = new Map();
+  let detectedDateTags = [];
 
   const dropzone = document.getElementById('dropzone');
   const fileInput = document.getElementById('fileInput');
@@ -381,7 +570,25 @@
   const formSection = document.getElementById('formSection');
   const fillForm = document.getElementById('fillForm');
   const generateBtn = document.getElementById('generateBtn');
+  const pdfBtn = document.getElementById('pdfBtn');
   const successMsg = document.getElementById('successMsg');
+
+  document.getElementById('resetBtn').addEventListener('click', () => {
+    zipInstance = null;
+    originalXml = '';
+    detectedTags = [];
+    detectedDateTags = [];
+    detectedGenderGroups = new Map();
+    currentFile = null;
+    fileInput.value = '';
+    filenameEl.classList.add('hidden');
+    document.getElementById('resetBtn').classList.add('hidden');
+    tagsSection.classList.add('hidden');
+    formSection.classList.add('hidden');
+    successMsg.style.display = 'none';
+    generateBtn.disabled = true;
+    pdfBtn.disabled = true;
+  });
 
   dropzone.addEventListener('dragover', e => { e.preventDefault(); dropzone.classList.add('dragover'); });
   dropzone.addEventListener('dragleave', () => dropzone.classList.remove('dragover'));
@@ -403,8 +610,9 @@
     }
     currentFile = file;
 
-    filenameEl.textContent = '📎 ' + file.name;
+    document.getElementById('filenameText').textContent = '📎 ' + file.name;
     filenameEl.classList.remove('hidden');
+    document.getElementById('resetBtn').classList.remove('hidden');
     successMsg.style.display = 'none';
 
     const reader = new FileReader();
@@ -413,9 +621,47 @@
         zipInstance = new PizZip(e.target.result);
         originalXml = zipInstance.files['word/document.xml'].asText();
         const regex = /\[([^\]]+)\]/g;
-        detectedTags = [...new Set([...originalXml.matchAll(regex)].map(m => m[1]))];
-        renderTags(detectedTags);
-        renderForm(detectedTags);
+        const allMatches = [...originalXml.matchAll(regex)];
+        const genderRegex = /^(?:([^\]:]+):)?([^|]+)\|(.+)$/;
+        const dateRegex = /^(.+):fecha$/i;
+        detectedTags = [];
+        detectedDateTags = [];
+        detectedGenderGroups = new Map();
+        const seenNormal = new Set();
+        const seenDate = new Set();
+        allMatches.forEach(m => {
+          const inner = m[1];
+          const gm = inner.match(genderRegex);
+          if (gm) {
+            const groupKey = gm[1] ? gm[1] : inner;
+            const masc = gm[2];
+            const fem = gm[3];
+            const fullTag = '[' + inner + ']';
+            if (!detectedGenderGroups.has(groupKey)) {
+              detectedGenderGroups.set(groupKey, { displayName: groupKey, pairs: [] });
+            }
+            const group = detectedGenderGroups.get(groupKey);
+            if (!group.pairs.some(p => p.fullTag === fullTag)) {
+              group.pairs.push({ fullTag, masc, fem });
+            }
+          } else {
+            const dm = inner.match(dateRegex);
+            if (dm) {
+              const key = dm[1];
+              if (!seenDate.has(key)) {
+                seenDate.add(key);
+                detectedDateTags.push({ fullTag: '[' + inner + ']', key });
+              }
+            } else {
+              if (!seenNormal.has(inner)) {
+                seenNormal.add(inner);
+                detectedTags.push(inner);
+              }
+            }
+          }
+        });
+        renderTags(detectedTags, detectedDateTags, detectedGenderGroups);
+        renderForm(detectedTags, detectedDateTags, detectedGenderGroups);
       } catch (err) {
         alert('Error al leer el archivo: ' + err.message);
       }
@@ -423,9 +669,18 @@
     reader.readAsArrayBuffer(file);
   }
 
-  function renderTags(tags) {
+  function formatDateES(val) {
+    if (!val) return '';
+    const [y, m, d] = val.split('-').map(Number);
+    const months = ['Enero','Febrero','Marzo','Abril','Mayo','Junio',
+                    'Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+    return d + ' de ' + months[m - 1] + ' de ' + y;
+  }
+
+  function renderTags(tags, dateTags, genderGroups) {
     tagsList.innerHTML = '';
-    if (tags.length === 0) {
+    const totalItems = tags.length + dateTags.length + genderGroups.size;
+    if (totalItems === 0) {
       tagsList.innerHTML = '<span style="color:#888;font-size:0.9rem;">No se detectaron etiquetas del tipo [ETIQUETA]</span>';
     } else {
       tags.forEach(tag => {
@@ -434,13 +689,69 @@
         badge.textContent = '[' + tag + ']';
         tagsList.appendChild(badge);
       });
+      dateTags.forEach(({ key }) => {
+        const badge = document.createElement('span');
+        badge.className = 'tag-badge--date';
+        badge.textContent = '📅 ' + key;
+        tagsList.appendChild(badge);
+      });
+      genderGroups.forEach((group, groupKey) => {
+        const badge = document.createElement('span');
+        badge.className = 'tag-badge--gender';
+        badge.textContent = '⚥ ' + group.displayName + ' (' + group.pairs.map(p => p.masc).join('/') + '|' + group.pairs.map(p => p.fem).join('/') + ')';
+        badge.title = group.pairs.map(p => p.fullTag).join(', ');
+        tagsList.appendChild(badge);
+      });
     }
     tagsSection.classList.remove('hidden');
   }
 
-  function renderForm(tags) {
+  function updateGenderPreview(groupKey, group) {
+    const safeKey = groupKey.replace(/[^a-zA-Z0-9_]/g, '_');
+    const checked = fillForm.querySelector('input[name="gender_' + safeKey + '"]:checked');
+    const isMasc = !checked || checked.value === 'masc';
+    const preview = fillForm.querySelector('#preview_' + safeKey);
+    if (preview) {
+      const values = group.pairs.map(p => isMasc ? p.masc : p.fem).join(', ');
+      preview.innerHTML = 'Se insertará: <strong>' + values + '</strong>';
+    }
+  }
+
+  function buildFilledXml() {
+    let xmlFinal = originalXml;
+
+    detectedDateTags.forEach(({ fullTag, key }) => {
+      const input = document.getElementById('date_' + key);
+      xmlFinal = xmlFinal.replaceAll(fullTag, formatDateES(input ? input.value : ''));
+    });
+
+    detectedGenderGroups.forEach((group, groupKey) => {
+      const safeKey = groupKey.replace(/[^a-zA-Z0-9_]/g, '_');
+      const checked = fillForm.querySelector('input[name="gender_' + safeKey + '"]:checked');
+      const isMasc = !checked || checked.value === 'masc';
+      group.pairs.forEach(({ fullTag, masc, fem }) => {
+        xmlFinal = xmlFinal.replaceAll(fullTag, isMasc ? masc : fem);
+      });
+    });
+
+    const valores = {};
+    detectedTags.forEach(tag => {
+      const input = document.getElementById('field_' + tag);
+      valores[tag] = input ? input.value : '';
+    });
+
+    for (const [tag, valor] of Object.entries(valores)) {
+      xmlFinal = xmlFinal.replaceAll('[' + tag + ']', valor);
+    }
+
+    return { xmlFinal, valores };
+  }
+
+  function renderForm(tags, dateTags, genderGroups) {
     fillForm.innerHTML = '';
-    generateBtn.disabled = tags.length === 0;
+    const totalItems = tags.length + dateTags.length + genderGroups.size;
+    generateBtn.disabled = totalItems === 0;
+    pdfBtn.disabled = totalItems === 0;
 
     tags.forEach(tag => {
       const field = document.createElement('div');
@@ -462,22 +773,121 @@
       fillForm.appendChild(field);
     });
 
+    if (dateTags.length > 0 && tags.length > 0) {
+      const sep = document.createElement('div');
+      sep.className = 'date-section-label';
+      sep.textContent = 'Fecha';
+      fillForm.appendChild(sep);
+    }
+
+    dateTags.forEach(({ fullTag, key }) => {
+      const field = document.createElement('div');
+      field.className = 'field';
+
+      const label = document.createElement('label');
+      label.htmlFor = 'date_' + key;
+      const humanName = key.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+      label.innerHTML = humanName + ' <span class="tag-hint">' + fullTag + '</span>';
+
+      const input = document.createElement('input');
+      input.type = 'date';
+      input.id = 'date_' + key;
+      input.name = 'date_' + key;
+
+      field.appendChild(label);
+      field.appendChild(input);
+      fillForm.appendChild(field);
+    });
+
+    if (genderGroups.size > 0 && (tags.length > 0 || dateTags.length > 0)) {
+      const sep = document.createElement('div');
+      sep.className = 'gender-section-label';
+      sep.textContent = 'Género gramatical';
+      fillForm.appendChild(sep);
+    }
+
+    genderGroups.forEach((group, groupKey) => {
+      const safeKey = groupKey.replace(/[^a-zA-Z0-9_]/g, '_');
+      const field = document.createElement('div');
+      field.className = 'field';
+
+      const label = document.createElement('label');
+      const humanName = group.displayName.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+      const hints = group.pairs.map(p => '<span class="tag-hint">' + p.fullTag + '</span>').join(' ');
+      label.innerHTML = humanName + ' ' + hints;
+
+      const control = document.createElement('div');
+      control.className = 'segmented-control';
+
+      const idMasc = 'gender_' + safeKey + '_masc';
+      const idFem = 'gender_' + safeKey + '_fem';
+
+      const radioMasc = document.createElement('input');
+      radioMasc.type = 'radio';
+      radioMasc.name = 'gender_' + safeKey;
+      radioMasc.id = idMasc;
+      radioMasc.value = 'masc';
+      radioMasc.checked = true;
+
+      const labelMasc = document.createElement('label');
+      labelMasc.htmlFor = idMasc;
+      labelMasc.textContent = 'Masculino';
+
+      const radioFem = document.createElement('input');
+      radioFem.type = 'radio';
+      radioFem.name = 'gender_' + safeKey;
+      radioFem.id = idFem;
+      radioFem.value = 'fem';
+
+      const labelFem = document.createElement('label');
+      labelFem.htmlFor = idFem;
+      labelFem.textContent = 'Femenino';
+
+      control.appendChild(radioMasc);
+      control.appendChild(labelMasc);
+      control.appendChild(radioFem);
+      control.appendChild(labelFem);
+
+      const preview = document.createElement('div');
+      preview.className = 'gender-preview';
+      preview.id = 'preview_' + safeKey;
+
+      field.appendChild(label);
+      field.appendChild(control);
+      field.appendChild(preview);
+      fillForm.appendChild(field);
+
+      radioMasc.addEventListener('change', () => updateGenderPreview(groupKey, group));
+      radioFem.addEventListener('change', () => updateGenderPreview(groupKey, group));
+      updateGenderPreview(groupKey, group);
+    });
+
+    if (new URLSearchParams(location.search).has('dev')) {
+      const fillBtn = document.createElement('button');
+      fillBtn.type = 'button';
+      fillBtn.textContent = 'Rellenar de prueba';
+      fillBtn.style.cssText = 'display:block;width:100%;margin-bottom:1rem;padding:0.6rem 1rem;font-size:0.88rem;cursor:pointer;border:2px dashed #6366f1;border-radius:9px;background:#f5f3ff;color:#4f46e5;font-weight:700;text-align:center;';
+      fillBtn.addEventListener('click', () => {
+        const today = new Date().toISOString().slice(0, 10);
+        tags.forEach(tag => {
+          const el = document.getElementById('field_' + tag);
+          if (el) el.value = tag.toLowerCase().replace(/_/g, ' ');
+        });
+        dateTags.forEach(({ key }) => {
+          const el = document.getElementById('date_' + key);
+          if (el) el.value = today;
+        });
+      });
+      fillForm.before(fillBtn);
+    }
+
     formSection.classList.remove('hidden');
   }
 
   generateBtn.addEventListener('click', async () => {
     if (!zipInstance || !originalXml) return;
 
-    const valores = {};
-    detectedTags.forEach(tag => {
-      const input = document.getElementById('field_' + tag);
-      valores[tag] = input ? input.value : '';
-    });
-
-    let xmlFinal = originalXml;
-    for (const [tag, valor] of Object.entries(valores)) {
-      xmlFinal = xmlFinal.replaceAll('[' + tag + ']', valor);
-    }
+    const { xmlFinal, valores } = buildFilledXml();
 
     try {
       const newZip = new PizZip(await currentFile.arrayBuffer());
@@ -488,9 +898,19 @@
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      const ts = new Date().toISOString().replace(/[-:T]/g, '').slice(0, 14);
-      const baseName = currentFile.name.replace(/\.docx$/i, '');
-      a.download = baseName + '_' + ts + '.docx';
+      let baseName = currentFile.name.replace(/\.docx$/i, '');
+
+      detectedDateTags.forEach(({ fullTag, key }) => {
+        const input = document.getElementById('date_' + key);
+        baseName = baseName.replaceAll(fullTag, formatDateES(input ? input.value : ''));
+      });
+
+      for (const [tag, valor] of Object.entries(valores)) {
+        baseName = baseName.replaceAll('[' + tag + ']', valor);
+      }
+
+      baseName = baseName.replace(/[/\\:*?"<>|]/g, '_').trim() || 'documento';
+      a.download = baseName + '.docx';
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
@@ -499,6 +919,80 @@
       successMsg.style.display = 'block';
     } catch (err) {
       alert('Error al generar el documento: ' + err.message);
+    }
+  });
+
+  pdfBtn.addEventListener('click', async () => {
+    if (!zipInstance || !originalXml) return;
+
+    const printWin = window.open('', '_blank');
+    if (!printWin) { alert('Permite ventanas emergentes para generar el PDF.'); return; }
+
+    const { xmlFinal } = buildFilledXml();
+
+    try {
+      const newZip = new PizZip(await currentFile.arrayBuffer());
+      newZip.file('word/document.xml', xmlFinal);
+      const blob = newZip.generate({ type: 'blob' });
+      const arrayBuffer = await blob.arrayBuffer();
+
+      const uint8 = new Uint8Array(arrayBuffer);
+      let binary = '';
+      for (let i = 0; i < uint8.length; i += 8192)
+        binary += String.fromCharCode.apply(null, uint8.subarray(i, i + 8192));
+      const b64 = btoa(binary);
+
+      const { valores } = buildFilledXml();
+      let baseName = currentFile.name.replace(/\.docx$/i, '');
+      detectedDateTags.forEach(({ fullTag, key }) => {
+        const input = document.getElementById('date_' + key);
+        baseName = baseName.replaceAll(fullTag, formatDateES(input ? input.value : ''));
+      });
+      for (const [tag, valor] of Object.entries(valores)) {
+        baseName = baseName.replaceAll('[' + tag + ']', valor);
+      }
+      baseName = baseName.replace(/[/\\:*?"<>|]/g, '_').trim() || 'documento';
+
+      const twipToCm = v => +(parseInt(v, 10) / 1440 * 2.54).toFixed(3);
+      const marTag = (xmlFinal.match(/<w:pgMar\s[^/]*/) || [])[0] || '';
+      const pgM = attr => { const m = marTag.match(new RegExp('w:' + attr + '="(\\d+)"')); return m ? twipToCm(m[1]) : 2.5; };
+      const mTop = pgM('top'), mRight = pgM('right'), mBottom = pgM('bottom'), mLeft = pgM('left');
+
+      printWin.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8">
+        <title>${baseName}</title>
+        <style>
+          @page {
+            margin: ${mTop}cm ${mRight}cm ${mBottom}cm ${mLeft}cm;
+            @top-left { content: none; }
+            @top-center { content: none; }
+            @top-right { content: none; }
+            @bottom-left { content: none; }
+            @bottom-center { content: none; }
+            @bottom-right { content: none; }
+          }
+          body { margin: 0; padding: 0; }
+          .docx-wrapper { background: none !important; padding: 0 !important; margin: 0 !important; }
+          .docx-wrapper > section { box-shadow: none !important; border: none !important; padding: 0 !important; margin: 0 !important; width: auto !important; min-height: auto !important; }
+        </style>
+      </head><body><div id="c"></div><script type="module">
+        import { renderAsync } from 'https://esm.sh/docx-preview';
+        const bin = atob('${b64}');
+        const buf = new Uint8Array(bin.length);
+        for (let i = 0; i < bin.length; i++) buf[i] = bin.charCodeAt(i);
+        await renderAsync(buf.buffer, document.getElementById('c'), null, {
+          renderHeaders: false,
+          renderFooters: false,
+          ignoreWidth: true,
+          ignoreHeight: true,
+          breakPages: false,
+        });
+        window.print();
+        window.close();
+      <\/script></body></html>`);
+      printWin.document.close();
+    } catch (err) {
+      printWin.close();
+      alert('Error al generar el PDF: ' + err.message);
     }
   });
 </script>
