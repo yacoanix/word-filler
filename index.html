@@ -241,6 +241,10 @@
 
     .field input::placeholder { color: #c4c4d0; }
 
+    .field input[type="date"] {
+      width: 100%;
+    }
+
     .divider {
       border: none;
       border-top: 1px solid #f0f0f5;
@@ -835,24 +839,33 @@
       fillForm.appendChild(sep);
     }
 
-    dateTags.forEach(({ fullTag, key }) => {
-      const field = document.createElement('div');
-      field.className = 'field';
+    if (dateTags.length > 0) {
+      const dateGrid = document.createElement('div');
+      dateGrid.style.cssText = 'display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:1rem;align-items:end;';
 
-      const label = document.createElement('label');
-      label.htmlFor = 'date_' + key;
-      const humanName = key.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
-      label.innerHTML = humanName + ' <span class="tag-hint">' + fullTag + '</span>';
+      dateTags.forEach(({ fullTag, key }) => {
+        const field = document.createElement('div');
+        field.className = 'field';
 
-      const input = document.createElement('input');
-      input.type = 'date';
-      input.id = 'date_' + key;
-      input.name = 'date_' + key;
+        const label = document.createElement('label');
+        label.htmlFor = 'date_' + key;
+        const humanName = key.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+        label.style.flexDirection = 'column';
+        label.style.alignItems = 'flex-start';
+        label.innerHTML = '<span>' + humanName + '</span><span class="tag-hint">' + fullTag + '</span>';
 
-      field.appendChild(label);
-      field.appendChild(input);
-      fillForm.appendChild(field);
-    });
+        const input = document.createElement('input');
+        input.type = 'date';
+        input.id = 'date_' + key;
+        input.name = 'date_' + key;
+
+        field.appendChild(label);
+        field.appendChild(input);
+        dateGrid.appendChild(field);
+      });
+
+      fillForm.appendChild(dateGrid);
+    }
 
     if (genderGroups.size > 0 && (tags.length > 0 || dateTags.length > 0)) {
       const sep = document.createElement('div');
